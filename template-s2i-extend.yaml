@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: s2i-extend-ca-trust 
+parameters:
+- name: BUILD_NAME
+  description: Name of the build
+  required: true
+  displayName: Build Name
+  value: s2i-internal-python
+- name: S2I_IMAGE
+  description: The s2i image to extend the CA Trust for.
+  required: true
+  displayName: S2I ImageStream Name:Tag
+  value: "python:3.5"
+- name: S2I_IMAGE_NS
+  description: The namespace in which the s2i image exists
+  required: false
+  value: openshift
+- name: GIT_SRC_URL
+  description: The source URL for the s2i extender
+  required: true
+  value: "https://github.com/gillarkod/s2i-extend-add-ca.git"
+- name: GIT_SRC_REF
+  description: The source reference for the s2i build
+  displayName: Source Reference
+  required: true
+  value: master
+- description: Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
+  displayName: GitHub Webhook Secret
+  from: '[a-zA-Z0-9]{40}'
+  generate: expression
+  name: GITHUB_WEBHOOK_SECRET
+  required: true
+- description: A secret string used to configure the Generic webhook.
+  displayName: Generic Webhook Secret
+  from: '[a-zA-Z0-9]{40}'
+  generate: expression
+  name: GENERIC_WEBHOOK_SECRET
+  required: true
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: ${BUILD_NAME}
+    name: ${BUILD_NAME}
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${BUILD_NAME}:latest"
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        ref: ${GIT_SRC_REF}
+        uri: ${GIT_SRC_URL}
+      type: Git
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: ${S2I_IMAGE}
+          namespace: ${S2I_IMAGE_NS}
+      type: Docker
+    triggers: []
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: ${BUILD_NAME}
+    name: ${BUILD_NAME}
+  spec: {}
+  status:
+  dockerImageRepository: ""
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      name: ${BUILD_NAME}
+    name: ${BUILD_NAME}-pipeline
+  spec:
+    source:
+      #git:
+      #  uri: "https://github.com/gillarkod/s2i-extend-add-ca.git"
+    strategy:
+      jenkinsPipelineStrategy:
+        jenkinsfile: |-
+                node {
+                  stage("Initialize") {
+                    env
+                    project = env.PROJECT_NAME
+                  }
+                }
+      type: JenkinsPipeline
+    triggers:
+    - github:
+        secret: "${GITHUB_WEBHOOK_SECRET}"
+      type: GitHub
+    - generic:
+        secret: "${GENERIC_WEBHOOK_SECRET}"
+      type: Generic
