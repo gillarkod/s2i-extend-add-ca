@@ -43,7 +43,7 @@ objects:
   kind: BuildConfig
   metadata:
     labels:
-      app: ${BUILD_NAME}
+      name: ${BUILD_NAME}
     name: ${BUILD_NAME}
   spec:
     output:
@@ -70,7 +70,7 @@ objects:
   kind: ImageStream
   metadata:
     labels:
-      app: ${BUILD_NAME}
+      name: ${BUILD_NAME}
     name: ${BUILD_NAME}
   spec: {}
   status:
@@ -83,17 +83,12 @@ objects:
     name: ${BUILD_NAME}-pipeline
   spec:
     source:
-      #git:
-      #  uri: "https://github.com/gillarkod/s2i-extend-add-ca.git"
+      contextDir: s2i/${BUILD_NAME}
+      git:
+        uri: "https://github.com/gillarkod/s2i-extend-add-ca.git"
     strategy:
       jenkinsPipelineStrategy:
-        jenkinsfile: |-
-                node {
-                  stage("Initialize") {
-                    env
-                    project = env.PROJECT_NAME
-                  }
-                }
+        jenkinsfilePath: Jenkinsfile
       type: JenkinsPipeline
     triggers:
     - github:
