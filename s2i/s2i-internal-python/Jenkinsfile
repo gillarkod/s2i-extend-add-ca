@@ -1,0 +1,17 @@
+def project=""
+node {
+  stage("Initialize") {
+    project = env.PROJECT_NAME
+  }
+  stage("Start Build") {
+    openshift.withCluster() {
+      echo "Hello from project running Jenkins: ${openshift.project()}"
+      def bc = openshift.selector( 'buildconfig/s2i-internal-python' )
+      def build = bc.startBuild()
+      build.logs()
+
+      
+    }
+  }
+}
+
