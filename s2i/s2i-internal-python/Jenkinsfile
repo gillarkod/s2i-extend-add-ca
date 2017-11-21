@@ -2,16 +2,27 @@ def project=""
 node {
   stage("Initialize") {
     project = env.PROJECT_NAME
-  }
+  } 
   stage("Start Build") {
     openshift.withCluster() {
       echo "Hello from project running Jenkins: ${openshift.project()}"
       def bc = openshift.selector( 'buildconfig/s2i-internal-python' )
       def build = bc.startBuild()
       build.logs()
-
-      
     }
   }
+  node('jenkins-slave-image-mgmt') { 
+
+  stage('Inspect Image') {
+    sh """
+
+    set +x
+        
+    skopeo inspect docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest
+
+    """
+  }
+  }
+
 }
 
