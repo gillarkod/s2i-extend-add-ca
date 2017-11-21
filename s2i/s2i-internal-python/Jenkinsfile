@@ -18,7 +18,7 @@ node {
 
     set +x
         
-    skopeo inspect --tls-verify=false docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest
+    skopeo inspect --creds user:$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)--tls-verify=false docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest
 
     """
   }
