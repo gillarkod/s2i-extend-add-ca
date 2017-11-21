@@ -18,7 +18,7 @@ node {
 
     set +x
         
-    skopeo inspect docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest --insecure-policy --debug
+    skopeo inspect --insecure-policy --debug docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest
 
     """
   }
