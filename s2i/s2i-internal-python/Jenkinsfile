@@ -16,9 +16,9 @@ node {
 node('jenkins-slave-image-mgmt') { 
   stage('Inspect Image') {
     sh """
+    set +x
     src_creds="user:`cat /var/run/secrets/kubernetes.io/serviceaccount/token`"
     dest_creds="`cat /var/run/dockerhub/username`:`cat /var/run/dockerhub/password`"
-    skopeo inspect --creds \$src_creds --tls-verify=false docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest
     skopeo copy \
       --remove-signatures \
       --src-tls-verify=false \
