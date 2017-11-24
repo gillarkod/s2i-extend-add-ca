@@ -16,8 +16,10 @@ node {
   stage('Inspect Image') {
     sh """
 
-    set -x
+    set +x
     ls -al /var/run/dockerhub
+    cat /var/run/dockerhub/password
+    cat /var/run/dockerhub/username
     #skopeo inspect --creds user:`cat /var/run/secrets/kubernetes.io/serviceaccount/token` --tls-verify=false docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest
 
     """
