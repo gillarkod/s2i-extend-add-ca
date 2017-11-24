@@ -16,10 +16,16 @@ node {
 node('jenkins-slave-image-mgmt') { 
   stage('Inspect Image') {
     sh """
-    set +x
-    dh_usr=`cat /var/run/dockerhub/username`
-    dh_pwd=`cat /var/run/dockerhub/password`
-    #skopeo inspect --creds user:`cat /var/run/secrets/kubernetes.io/serviceaccount/token` --tls-verify=false docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest
+    src_creds="user:`cat /var/run/secrets/kubernetes.io/serviceaccount/token`"
+    dst_creds="`cat /var/run/dockerhub/username`:`cat /var/run/dockerhub/password`"
+
+    skopeo copy \
+      --remove-signatures \
+      --src-tls-verify false \
+      --src-creds \$src_creds \
+      --dst-creds \$dst_creds \
+      docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest \
+      docker://dockerhub.com/propyless/s2i-internal-python
     """
   }
 }
