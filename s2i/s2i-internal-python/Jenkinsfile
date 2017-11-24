@@ -14,7 +14,7 @@ node {
 }
 
 node('jenkins-slave-image-mgmt') { 
-  stage('Inspect Image') {
+  stage('Push Image Ext-Reg') {
     sh """
     set +x
     src_creds="user:`cat /var/run/secrets/kubernetes.io/serviceaccount/token`"
