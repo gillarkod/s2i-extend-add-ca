@@ -22,10 +22,10 @@ node('jenkins-slave-image-mgmt') {
     skopeo copy \
       --remove-signatures \
       --src-tls-verify false \
-      --src-creds \$src_creds \
-      --dst-creds \$dst_creds \
+      --src-creds "\$src_creds" \
+      --dst-creds "\$dst_creds" \
       docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest \
-      docker://dockerhub.com/propyless/s2i-internal-python
+      docker://docker.io/propyless/s2i-internal-python
     """
   }
 }
