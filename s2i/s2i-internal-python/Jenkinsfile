@@ -23,8 +23,8 @@ podTemplate(
       sh """
   
       set +x
-      dh_usr=$(cat /var/run/ext-registry/username)
-      dh_pwd=$(cat /var/run/ext-registry/password)
+      dh_usr=`cat /var/run/ext-registry/username`
+      dh_pwd=`cat /var/run/ext-registry/password`
       #skopeo inspect --creds user:`cat /var/run/secrets/kubernetes.io/serviceaccount/token` --tls-verify=false docker://docker-registry.default.svc:5000/test/s2i-internal-python:latest
   
       """
